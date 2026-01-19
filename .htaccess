@@ -1,0 +1,13 @@
+RewriteEngine On
+
+# If your hosting forces the document root to the project root (and you cannot
+# set it to /public), this forwards all requests into /public.
+
+# Block direct access to sensitive folders/files in the project root
+RewriteRule ^(src|database)(/|$) - [F,L]
+RewriteRule ^\.env$ - [F,L]
+
+# Rewrite everything into /public (preserves the path)
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^$ public/index.php [L]
+RewriteRule ^(.*)$ public/$1 [L]
