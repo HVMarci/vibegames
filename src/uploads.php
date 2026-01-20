@@ -54,6 +54,21 @@ function post_too_large(): bool
     return $postMaxBytes > 0 && $contentLength > $postMaxBytes;
 }
 
+function delete_uploaded_path(string $webPath): void
+{
+    if (!str_starts_with($webPath, '/uploads/')) {
+        return;
+    }
+    $rel = substr($webPath, strlen('/uploads/'));
+    if ($rel === '' || str_contains($rel, '/') || str_contains($rel, '\\') || str_contains($rel, '..')) {
+        return;
+    }
+    $full = __DIR__ . '/../public/uploads/' . $rel;
+    if (is_file($full)) {
+        @unlink($full);
+    }
+}
+
 function save_uploaded_image(array $file): string
 {
     $err = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);

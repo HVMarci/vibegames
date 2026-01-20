@@ -11,7 +11,6 @@ Server-rendered PHP app for:
 1. Create `.env` from `.env.example` and set DB credentials.
 2. Create the database and tables:
    - Run `database/schema.sql` in your MySQL client.
-   - If upgrading from 1–5 scoring to 1–10, also run `database/migrations/001_scores_1_10.sql`.
 3. Insert aspects (example):
    - `INSERT INTO aspects (label, weight, sort_order, active) VALUES ('UX', 2.0, 1, 1);`
 4. Start a dev server:
