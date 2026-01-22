@@ -194,7 +194,7 @@ th { text-align: left; color: var(--muted); font-weight: 700; }
 .toast.ok{ border-color: rgba(2,122,72,.35); }
 .toast.err{ border-color: rgba(180,35,24,.35); }
 .table-wrap{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table{ min-width: 520px; }
+table{ min-width: 620px; }
 .rank-badge{
   flex: 0 0 auto;
   min-width: 86px;
@@ -208,6 +208,21 @@ table{ min-width: 520px; }
   font-size: 34px;
   letter-spacing: .2px;
   color: var(--accent);
+}
+.rank-badge.medal-1{
+  background: rgba(212,175,55,.22);
+  border-color: rgba(212,175,55,.45);
+  color: #6b4e00;
+}
+.rank-badge.medal-2{
+  background: rgba(192,192,192,.28);
+  border-color: rgba(192,192,192,.55);
+  color: #3f4a55;
+}
+.rank-badge.medal-3{
+  background: rgba(205,127,50,.22);
+  border-color: rgba(205,127,50,.45);
+  color: #6a3b12;
 }
 .thumb {
   width: 220px; max-width: 40vw;

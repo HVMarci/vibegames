@@ -12,7 +12,7 @@ if (!$aspects) {
     render('Results', '<h1>Results</h1><p>No aspects configured.</p>');
 }
 
-function fmt_score(float $value, int $maxDecimals = 4): string
+function fmt_score(float $value, int $maxDecimals = 2): string
 {
     $s = number_format($value, $maxDecimals, '.', '');
     $s = rtrim($s, '0');
@@ -29,7 +29,8 @@ $rows = $pdo->query('
     a.id AS aspect_id,
     a.label AS aspect_label,
     a.weight AS aspect_weight,
-    AVG(vi.score) AS avg_score
+    AVG(vi.score) AS avg_score,
+    COUNT(vi.score) AS vote_count
   FROM entries e
   JOIN aspects a ON a.active = 1
   LEFT JOIN votes v ON v.entry_id = e.id
@@ -61,6 +62,7 @@ foreach ($rows as $r) {
         'label' => $r['aspect_label'],
         'weight' => $w,
         'avg' => $avg,
+        'count' => (int)$r['vote_count'],
         'weighted' => $avg === null ? 0.0 : ($avg * $w),
     ];
 }
@@ -90,11 +92,19 @@ foreach ($entries as $i => $e) {
         $rank = $i + 1; // competition ranking: 1,2,2,4
         $prevScoreKey = $scoreKey;
     }
+    $medalClass = '';
+    if ($rank === 1) {
+        $medalClass = ' medal-1';
+    } elseif ($rank === 2) {
+        $medalClass = ' medal-2';
+    } elseif ($rank === 3) {
+        $medalClass = ' medal-3';
+    }
     $content .= '<div class="card">';
     $content .= '<div class="entry-head">';
     $content .= '<div class="rank-col">';
-    $content .= '<div class="rank-badge">' . (int)$rank . '.</div>';
-    $content .= '<div class="msg ok pill rank-total">Total: ' . h(fmt_score((float)$e['total'], 4)) . '</div>';
+    $content .= '<div class="rank-badge' . $medalClass . '">' . (int)$rank . '.</div>';
+    $content .= '<div class="msg ok pill rank-total">Total: ' . h(fmt_score((float)$e['total'], 2)) . '</div>';
     $content .= '</div>';
     $content .= '<img class="thumb" src="' . h($e['screenshot_path']) . '" alt="Screenshot" />';
     $content .= '<div>';
@@ -103,18 +113,20 @@ foreach ($entries as $i => $e) {
     $content .= '</div></div>';
 
     $content .= '<div class="table-wrap" style="margin-top:10px;">';
-    $content .= '<table><thead><tr><th>Aspect</th><th>Weight</th><th>Avg</th><th>Avg×Weight</th></tr></thead><tbody>';
+    $content .= '<table><thead><tr><th>Aspect</th><th>Weight</th><th>Votes</th><th>Avg</th><th>Avg×Weight</th></tr></thead><tbody>';
     foreach ($aspects as $aspect) {
         $aid = (int)$aspect['id'];
         $a = $e['aspects'][$aid] ?? null;
         $avg = $a ? $a['avg'] : null;
         $weighted = $a ? $a['weighted'] : 0.0;
         $pct = (int)round(((float)$aspect['weight']) * 100);
+        $count = $a ? (int)$a['count'] : 0;
         $content .= '<tr>';
         $content .= '<td>' . h((string)$aspect['label']) . '</td>';
         $content .= '<td>' . h((string)$pct) . '%</td>';
-        $content .= '<td>' . ($avg === null ? '<span class="hint">—</span>' : h(fmt_score($avg, 4))) . '</td>';
-        $content .= '<td>' . h(fmt_score((float)$weighted, 4)) . '</td>';
+        $content .= '<td>' . h((string)$count) . '</td>';
+        $content .= '<td>' . ($avg === null ? '<span class="hint">—</span>' : h(fmt_score($avg, 2))) . '</td>';
+        $content .= '<td>' . h(fmt_score((float)$weighted, 2)) . '</td>';
         $content .= '</tr>';
     }
     $content .= '</tbody></table>';

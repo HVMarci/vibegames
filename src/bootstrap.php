@@ -14,7 +14,13 @@ load_env(__DIR__ . '/../.env');
 ini_set('display_errors', env('APP_ENV', 'dev') === 'dev' ? '1' : '0');
 error_reporting(E_ALL);
 
+$sessionLifetimeSeconds = 48 * 60 * 60;
+ini_set('session.cookie_lifetime', (string)$sessionLifetimeSeconds);
+ini_set('session.gc_maxlifetime', (string)$sessionLifetimeSeconds);
+
 session_set_cookie_params([
+    'lifetime' => $sessionLifetimeSeconds,
+    'path' => '/',
     'httponly' => true,
     'samesite' => 'Lax',
     'secure' => (($_SERVER['HTTPS'] ?? 'off') !== 'off') || str_starts_with(env('APP_BASE_URL', ''), 'https://'),
